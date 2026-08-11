@@ -1,7 +1,18 @@
-import React from 'react';
+'use client';
+import React, { useState } from 'react';
 import Link from 'next/link';
 
 const Footer = ({ categories }) => {
+  const [expandedMenus, setExpandedMenus] = useState({});
+
+  const toggleSubMenu = (e, catName) => {
+    e.preventDefault();
+    setExpandedMenus(prev => ({
+      ...prev,
+      [catName]: !prev[catName]
+    }));
+  };
+
   return (
     <footer>
       <div className="footer-content">
@@ -18,16 +29,26 @@ const Footer = ({ categories }) => {
           <ul className="footer-menu">
             {categories && categories.map((cat) => (
               <li key={cat.name} style={{ marginBottom: '10px' }}>
-                {cat.gid ? (
-                  <Link href={`/?gid=${cat.gid}`} style={{ fontWeight: '500', color: '#f36f21' }}>
-                    {cat.name}
-                  </Link>
-                ) : (
-                  <span style={{ fontWeight: '500', color: '#f36f21' }}>{cat.name}</span>
-                )}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  {cat.gid ? (
+                    <Link href={`/?gid=${cat.gid}`} style={{ fontWeight: '500', color: '#f36f21', flex: 1 }}>
+                      {cat.name}
+                    </Link>
+                  ) : (
+                    <span style={{ fontWeight: '500', color: '#f36f21', flex: 1 }}>{cat.name}</span>
+                  )}
+                  {cat.subCategories?.length > 0 && (
+                    <span 
+                      className={`footer-dropdown-toggle ${expandedMenus[cat.name] ? 'open' : ''}`}
+                      onClick={(e) => toggleSubMenu(e, cat.name)}
+                    >
+                      ▼
+                    </span>
+                  )}
+                </div>
                 
                 {cat.subCategories?.length > 0 && (
-                  <ul style={{ paddingLeft: '15px', marginTop: '5px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  <ul className={`footer-sub-menu ${expandedMenus[cat.name] ? 'open' : ''}`} style={{ paddingLeft: '15px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     {cat.subCategories.map(sub => (
                       <li key={sub.gid}>
                         <Link href={`/?gid=${sub.gid}`} style={{ color: '#ccc', fontSize: '0.9em' }}>

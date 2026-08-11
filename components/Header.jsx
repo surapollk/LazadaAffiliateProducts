@@ -109,13 +109,13 @@ const Header = ({ categories, activeGid, initialQuery = '' }) => {
                   )}
                   
                   {cat.subCategories?.length > 0 && (
-                    <ul className={`dropdown-menu ${expandedMenus[cat.name] ? 'mobile-open' : ''}`}>
+                    <ul className={`dropdown-menu ${expandedMenus[cat.name] ? 'open' : ''}`}>
                       {cat.subCategories.map(sub => (
                         <li key={sub.gid}>
                           <Link 
                             href={`/?gid=${sub.gid}`}
                             className={activeGid === sub.gid ? 'active' : ''}
-                            onClick={() => { setQuery(''); closeMenu(); }}
+                            onClick={() => { setQuery(''); closeMenu(); setExpandedMenus({}); }}
                           >
                             {sub.name}
                           </Link>

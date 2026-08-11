@@ -642,3 +642,46 @@ footer {
     padding: 15px; /* Larger hit area for mobile tapping */
   }
 }
+
+/* Unify Desktop and Mobile Toggle Behavior */
+@media (min-width: 769px) {
+  /* Show toggle on desktop */
+  .dropdown-toggle {
+    display: inline-flex !important;
+  }
+  
+  /* Disable hover triggering on desktop */
+  .has-dropdown:hover .dropdown-menu {
+    display: none !important;
+  }
+}
+
+/* Ensure 'open' class controls visibility on both desktop and mobile */
+.dropdown-menu.open {
+  display: flex !important;
+}
+
+/* Footer Menu Toggle Styles */
+.footer-dropdown-toggle {
+  cursor: pointer;
+  padding: 0 8px;
+  font-size: 0.8em;
+  transition: transform 0.2s;
+  display: inline-block;
+  user-select: none;
+}
+.footer-dropdown-toggle.open {
+  transform: rotate(180deg);
+}
+
+.footer-sub-menu {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease-in-out, margin-top 0.3s ease-in-out;
+  opacity: 0;
+}
+.footer-sub-menu.open {
+  max-height: 500px;
+  opacity: 1;
+  margin-top: 5px;
+}
