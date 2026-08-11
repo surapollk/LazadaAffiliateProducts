@@ -587,23 +587,34 @@ footer {
     padding: 15px; /* Larger tap target */
   }
 
-  /* Mobile Dropdown Overrides */
+  /* Mobile Dropdown Overrides (Accordion Style) */
   .dropdown-menu {
     position: static;
     box-shadow: none;
-    background-color: #ffffff;
-    margin-top: 5px;
+    background-color: #f9fafb; /* slightly gray to distinguish from main menu */
+    margin-top: 0;
     width: 100%;
     border-radius: 4px;
     transform: none; /* Remove translation on mobile */
+    
+    /* Accordion hidden state */
+    display: flex !important; /* Force flex so children render */
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    padding: 0;
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, padding 0.3s ease-in-out;
   }
 
   .dropdown-menu.open {
     transform: none;
+    max-height: 1000px; /* large enough to fit content */
+    opacity: 1;
+    padding: 10px 0;
   }
 
   .dropdown-menu a {
-    padding: 10px 20px !important; /* Mobile padding */
+    padding: 10px 30px !important; /* Mobile padding, indented */
   }
 }
 
