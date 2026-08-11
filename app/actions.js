@@ -45,22 +45,33 @@ export async function getCategories() {
 export async function fetchProductsAction(gid, page = 1, limit = 50, query = '') {
   try {
     let allProducts = [];
+    const categories = await getCategories();
+    const flatCategoriesList = [];
+    categories.forEach(c => {
+      if (c.gid) flatCategoriesList.push({ name: c.name, gid: c.gid });
+      if (c.subCategories) {
+        c.subCategories.forEach(s => flatCategoriesList.push({ name: s.name, gid: s.gid }));
+      }
+    });
     
     if (gid) {
       const fetchUrl = `${BASE_SHEET_URL}&gid=${gid}`;
       const response = await axios.get(fetchUrl);
       const parsedData = Papa.parse(response.data, { header: true, skipEmptyLines: true });
-      allProducts = parsedData.data;
+      const catName = flatCategoriesList.find(c => c.gid === gid)?.name || '';
+      allProducts = parsedData.data.map(p => ({ ...p, _category_name: catName }));
     } else {
       // Global search: fetch from all categories in parallel
-      const categories = await getCategories();
-      const allGids = categories.flatMap(c => [c.gid, ...(c.subCategories || []).map(s => s.gid)]).filter(Boolean);
+      const allGids = flatCategoriesList.map(c => c.gid);
       const promises = allGids.map(g => axios.get(`${BASE_SHEET_URL}&gid=${g}`));
       const responses = await Promise.all(promises);
       
-      for (const response of responses) {
+      for (let i = 0; i < responses.length; i++) {
+        const response = responses[i];
+        const catName = flatCategoriesList[i].name;
         const parsedData = Papa.parse(response.data, { header: true, skipEmptyLines: true });
-        allProducts = [...allProducts, ...parsedData.data];
+        const productsWithCat = parsedData.data.map(p => ({ ...p, _category_name: catName }));
+        allProducts = [...allProducts, ...productsWithCat];
       }
     }
     
@@ -68,7 +79,11 @@ export async function fetchProductsAction(gid, page = 1, limit = 50, query = '')
     
     if (query) {
       const q = query.toLowerCase();
-      products = products.filter(p => p.product_name.toLowerCase().includes(q));
+      products = products.filter(p => {
+        const pName = (p.product_name || '').toLowerCase();
+        const cName = (p._category_name || '').toLowerCase();
+        return pName.includes(q) || cName.includes(q);
+      });
     }
     
     const startIndex = (page - 1) * limit;
