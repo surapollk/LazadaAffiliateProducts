@@ -15,12 +15,28 @@ const Footer = ({ categories }) => {
         
         <div className="footer-col">
           <h3>หมวดหมู่สินค้า</h3>
-          <ul>
+          <ul className="footer-menu">
             {categories && categories.map((cat) => (
-              <li key={cat.gid}>
-                <Link href={`/?gid=${cat.gid}`}>
-                  {cat.name}
-                </Link>
+              <li key={cat.name} style={{ marginBottom: '10px' }}>
+                {cat.gid ? (
+                  <Link href={`/?gid=${cat.gid}`} style={{ fontWeight: '500', color: '#f36f21' }}>
+                    {cat.name}
+                  </Link>
+                ) : (
+                  <span style={{ fontWeight: '500', color: '#f36f21' }}>{cat.name}</span>
+                )}
+                
+                {cat.subCategories?.length > 0 && (
+                  <ul style={{ paddingLeft: '15px', marginTop: '5px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    {cat.subCategories.map(sub => (
+                      <li key={sub.gid}>
+                        <Link href={`/?gid=${sub.gid}`} style={{ color: '#ccc', fontSize: '0.9em' }}>
+                          - {sub.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>

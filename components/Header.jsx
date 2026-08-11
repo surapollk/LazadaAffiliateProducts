@@ -7,6 +7,7 @@ const Header = ({ categories, activeGid, initialQuery = '' }) => {
   const router = useRouter();
   const [query, setQuery] = useState(initialQuery);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [expandedMenus, setExpandedMenus] = useState({});
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -15,6 +16,15 @@ const Header = ({ categories, activeGid, initialQuery = '' }) => {
   };
 
   const closeMenu = () => setIsMenuOpen(false);
+
+  const toggleSubMenu = (e, catName) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setExpandedMenus(prev => ({
+      ...prev,
+      [catName]: !prev[catName]
+    }));
+  };
 
   return (
     <header>
@@ -65,21 +75,41 @@ const Header = ({ categories, activeGid, initialQuery = '' }) => {
               {categories && categories.map((cat) => (
                 <li key={cat.name} className={cat.subCategories?.length > 0 ? 'has-dropdown' : ''}>
                   {cat.gid ? (
-                    <Link 
-                      href={`/?gid=${cat.gid}`}
-                      className={activeGid === cat.gid ? 'active' : ''}
-                      onClick={() => { setQuery(''); closeMenu(); }}
-                    >
-                      {cat.name} {cat.subCategories?.length > 0 && '▼'}
-                    </Link>
+                    <div className="nav-item-wrapper">
+                      <Link 
+                        href={`/?gid=${cat.gid}`}
+                        className={activeGid === cat.gid ? 'active' : ''}
+                        onClick={() => { setQuery(''); closeMenu(); }}
+                      >
+                        {cat.name}
+                      </Link>
+                      {cat.subCategories?.length > 0 && (
+                        <span 
+                          className={`dropdown-toggle ${expandedMenus[cat.name] ? 'open' : ''}`}
+                          onClick={(e) => toggleSubMenu(e, cat.name)}
+                        >
+                          ▼
+                        </span>
+                      )}
+                    </div>
                   ) : (
-                    <span className="nav-group-title">
-                      {cat.name} {cat.subCategories?.length > 0 && '▼'}
-                    </span>
+                    <div className="nav-item-wrapper">
+                      <span className="nav-group-title">
+                        {cat.name}
+                      </span>
+                      {cat.subCategories?.length > 0 && (
+                        <span 
+                          className={`dropdown-toggle ${expandedMenus[cat.name] ? 'open' : ''}`}
+                          onClick={(e) => toggleSubMenu(e, cat.name)}
+                        >
+                          ▼
+                        </span>
+                      )}
+                    </div>
                   )}
                   
                   {cat.subCategories?.length > 0 && (
-                    <ul className="dropdown-menu">
+                    <ul className={`dropdown-menu ${expandedMenus[cat.name] ? 'mobile-open' : ''}`}>
                       {cat.subCategories.map(sub => (
                         <li key={sub.gid}>
                           <Link 
