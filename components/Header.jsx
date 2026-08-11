@@ -38,14 +38,36 @@ const Header = ({ categories, activeGid, initialQuery = '' }) => {
         <nav className="main-nav">
           <ul>
             {categories && categories.map((cat) => (
-              <li key={cat.gid}>
-                <Link 
-                  href={`/?gid=${cat.gid}`}
-                  className={activeGid === cat.gid ? 'active' : ''}
-                  onClick={() => setQuery('')} // Clear search when changing category
-                >
-                  {cat.name}
-                </Link>
+              <li key={cat.name} className={cat.subCategories?.length > 0 ? 'has-dropdown' : ''}>
+                {cat.gid ? (
+                  <Link 
+                    href={`/?gid=${cat.gid}`}
+                    className={activeGid === cat.gid ? 'active' : ''}
+                    onClick={() => setQuery('')}
+                  >
+                    {cat.name} {cat.subCategories?.length > 0 && '▼'}
+                  </Link>
+                ) : (
+                  <span className="nav-group-title">
+                    {cat.name} {cat.subCategories?.length > 0 && '▼'}
+                  </span>
+                )}
+                
+                {cat.subCategories?.length > 0 && (
+                  <ul className="dropdown-menu">
+                    {cat.subCategories.map(sub => (
+                      <li key={sub.gid}>
+                        <Link 
+                          href={`/?gid=${sub.gid}`}
+                          className={activeGid === sub.gid ? 'active' : ''}
+                          onClick={() => setQuery('')}
+                        >
+                          {sub.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>

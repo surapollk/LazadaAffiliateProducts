@@ -9,13 +9,33 @@ export async function getCategories() {
   try {
     const response = await axios.get(SHEET_HTML_URL);
     const html = response.data;
-    const categories = [];
+    const flatCategories = [];
     const regex = /items\.push\(\{name:\s*"([^"]+)",\s*pageUrl:.*?gid=([0-9]+)"/g;
     let match;
     while ((match = regex.exec(html)) !== null) {
-      categories.push({ name: match[1], gid: match[2] });
+      flatCategories.push({ name: match[1].trim(), gid: match[2] });
     }
-    return categories;
+
+    const categoriesMap = {};
+    flatCategories.forEach(cat => {
+      if (cat.name.includes('-')) {
+        const parts = cat.name.split('-');
+        const mainName = parts[0].trim();
+        const subName = parts.slice(1).join('-').trim();
+        if (!categoriesMap[mainName]) {
+          categoriesMap[mainName] = { name: mainName, gid: null, subCategories: [] };
+        }
+        categoriesMap[mainName].subCategories.push({ name: subName, gid: cat.gid });
+      } else {
+        const mainName = cat.name;
+        if (!categoriesMap[mainName]) {
+          categoriesMap[mainName] = { name: mainName, gid: cat.gid, subCategories: [] };
+        } else {
+          categoriesMap[mainName].gid = cat.gid;
+        }
+      }
+    });
+    return Object.values(categoriesMap);
   } catch (err) {
     console.error("Failed to fetch categories", err);
     return [];
@@ -34,7 +54,8 @@ export async function fetchProductsAction(gid, page = 1, limit = 50, query = '')
     } else {
       // Global search: fetch from all categories in parallel
       const categories = await getCategories();
-      const promises = categories.map(c => axios.get(`${BASE_SHEET_URL}&gid=${c.gid}`));
+      const allGids = categories.flatMap(c => [c.gid, ...(c.subCategories || []).map(s => s.gid)]).filter(Boolean);
+      const promises = allGids.map(g => axios.get(`${BASE_SHEET_URL}&gid=${g}`));
       const responses = await Promise.all(promises);
       
       for (const response of responses) {

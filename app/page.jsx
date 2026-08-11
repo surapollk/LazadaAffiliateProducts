@@ -8,8 +8,15 @@ export async function generateMetadata({ searchParams }) {
   const searchQuery = searchParams.q || '';
   const isGlobalSearch = searchQuery && !searchParams.gid;
   
-  const activeGid = isGlobalSearch ? '' : (searchParams.gid || (categories[0]?.gid || ''));
-  const activeCategory = activeGid ? categories.find(c => c.gid === activeGid) : null;
+  const firstGid = categories.flatMap(c => [c.gid, ...(c.subCategories || []).map(s => s.gid)]).find(Boolean);
+  const activeGid = isGlobalSearch ? '' : (searchParams.gid || firstGid || '');
+  
+  let activeCategory = null;
+  for (const c of categories) {
+    if (c.gid === activeGid) { activeCategory = c; break; }
+    const sub = c.subCategories?.find(s => s.gid === activeGid);
+    if (sub) { activeCategory = sub; break; }
+  }
   
   let categoryName = activeCategory ? activeCategory.name : 'สินค้าแนะนำ';
   if (isGlobalSearch) {
@@ -29,12 +36,20 @@ export default async function Page({ searchParams }) {
   
   // If user is searching and didn't specify a category, do a global search
   const isGlobalSearch = searchQuery && !searchParams.gid;
-  const activeGid = isGlobalSearch ? '' : (searchParams.gid || (categories[0]?.gid || ''));
+  
+  const firstGid = categories.flatMap(c => [c.gid, ...(c.subCategories || []).map(s => s.gid)]).find(Boolean);
+  const activeGid = isGlobalSearch ? '' : (searchParams.gid || firstGid || '');
   
   // Fetch initial products server-side
   const { products: initialProducts, hasMore: initialHasMore } = await fetchProductsAction(activeGid, 1, 50, searchQuery);
   
-  const activeCategory = activeGid ? categories.find(c => c.gid === activeGid) : null;
+  let activeCategory = null;
+  for (const c of categories) {
+    if (c.gid === activeGid) { activeCategory = c; break; }
+    const sub = c.subCategories?.find(s => s.gid === activeGid);
+    if (sub) { activeCategory = sub; break; }
+  }
+  
   let categoryName = activeCategory ? activeCategory.name : 'สินค้าแนะนำ';
   
   if (searchQuery) {
