@@ -58,7 +58,27 @@ const Header = ({ categories, activeGid, initialQuery = '' }) => {
           </button>
         </div>
         
+        {/* Mobile Menu Backdrop */}
+        <div className={`mobile-menu-overlay ${isMenuOpen ? 'visible' : ''}`} onClick={closeMenu}></div>
+
         <div className={`nav-and-search ${isMenuOpen ? 'open' : ''}`}>
+          {/* Mobile Drawer Header */}
+          <div className="mobile-drawer-header">
+            <div className="user-profile">
+              <div className="avatar">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+              <div className="user-info">
+                <span className="welcome-text">ยินดีต้อนรับ</span>
+                <Link href="#" className="login-link">เข้าสู่ระบบ / สมัครสมาชิก</Link>
+              </div>
+            </div>
+            <button className="close-menu-btn" onClick={closeMenu}>✕</button>
+          </div>
+
           <form className="search-form" onSubmit={handleSearch}>
             <div className="search-input-wrapper">
               <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
