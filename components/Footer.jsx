@@ -31,11 +31,11 @@ const Footer = ({ categories }) => {
               <li key={cat.name} style={{ marginBottom: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   {cat.gid ? (
-                    <Link href={`/?gid=${cat.gid}`} style={{ fontWeight: '500', color: '#f36f21', flex: 1 }}>
+                    <Link href={`/?gid=${cat.gid}`} style={{ fontWeight: '500', color: '#f36f21', marginRight: '8px' }}>
                       {cat.name}
                     </Link>
                   ) : (
-                    <span style={{ fontWeight: '500', color: '#f36f21', flex: 1 }}>{cat.name}</span>
+                    <span style={{ fontWeight: '500', color: '#f36f21', marginRight: '8px' }}>{cat.name}</span>
                   )}
                   {cat.subCategories?.length > 0 && (
                     <span 

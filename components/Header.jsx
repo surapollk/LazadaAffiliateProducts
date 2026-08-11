@@ -35,7 +35,12 @@ const Header = ({ categories, activeGid, initialQuery = '' }) => {
           </div>
           <button 
             className="mobile-menu-toggle" 
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={() => {
+              if (!isMenuOpen) {
+                setExpandedMenus({}); // Reset sub-menus when opening
+              }
+              setIsMenuOpen(!isMenuOpen);
+            }}
             aria-label="Toggle menu"
           >
             {isMenuOpen ? (
