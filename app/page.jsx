@@ -1,33 +1,20 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ProductList from '../components/ProductList';
-import axios from 'axios';
-import { fetchProductsAction } from './actions';
-
-const SHEET_HTML_URL = 'https://docs.google.com/spreadsheets/d/1p8RBj2R1_5YoQuuxM8uUJT079VYwnrWjacgritMSu9Y/htmlview';
-
-async function getCategories() {
-  try {
-    const response = await axios.get(SHEET_HTML_URL);
-    const html = response.data;
-    const categories = [];
-    const regex = /items\.push\(\{name:\s*"([^"]+)",\s*pageUrl:.*?gid=([0-9]+)"/g;
-    let match;
-    while ((match = regex.exec(html)) !== null) {
-      categories.push({ name: match[1], gid: match[2] });
-    }
-    return categories;
-  } catch (err) {
-    console.error("Failed to fetch categories", err);
-    return [];
-  }
-}
+import { fetchProductsAction, getCategories } from './actions';
 
 export async function generateMetadata({ searchParams }) {
   const categories = await getCategories();
-  const activeGid = searchParams.gid || (categories[0]?.gid || '');
-  const activeCategory = categories.find(c => c.gid === activeGid);
-  const categoryName = activeCategory ? activeCategory.name : 'สินค้าแนะนำ';
+  const searchQuery = searchParams.q || '';
+  const isGlobalSearch = searchQuery && !searchParams.gid;
+  
+  const activeGid = isGlobalSearch ? '' : (searchParams.gid || (categories[0]?.gid || ''));
+  const activeCategory = activeGid ? categories.find(c => c.gid === activeGid) : null;
+  
+  let categoryName = activeCategory ? activeCategory.name : 'สินค้าแนะนำ';
+  if (isGlobalSearch) {
+    categoryName = `ค้นหาสินค้าทั้งหมด: "${searchQuery}"`;
+  }
 
   return {
     title: `${categoryName} | Lazada Affiliate Mall`,
@@ -38,17 +25,24 @@ export async function generateMetadata({ searchParams }) {
 
 export default async function Page({ searchParams }) {
   const categories = await getCategories();
-  const activeGid = searchParams.gid || (categories[0]?.gid || '');
   const searchQuery = searchParams.q || '';
+  
+  // If user is searching and didn't specify a category, do a global search
+  const isGlobalSearch = searchQuery && !searchParams.gid;
+  const activeGid = isGlobalSearch ? '' : (searchParams.gid || (categories[0]?.gid || ''));
   
   // Fetch initial products server-side
   const { products: initialProducts, hasMore: initialHasMore } = await fetchProductsAction(activeGid, 1, 50, searchQuery);
   
-  const activeCategory = categories.find(c => c.gid === activeGid);
+  const activeCategory = activeGid ? categories.find(c => c.gid === activeGid) : null;
   let categoryName = activeCategory ? activeCategory.name : 'สินค้าแนะนำ';
   
   if (searchQuery) {
-    categoryName = `ผลการค้นหา "${searchQuery}" ใน ${categoryName}`;
+    if (isGlobalSearch) {
+      categoryName = `ผลการค้นหา "${searchQuery}" จากทุกหมวดหมู่`;
+    } else {
+      categoryName = `ผลการค้นหา "${searchQuery}" ใน ${categoryName}`;
+    }
   }
 
   return (

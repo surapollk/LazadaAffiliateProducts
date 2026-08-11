@@ -9,7 +9,7 @@ const Header = ({ categories, activeGid, initialQuery = '' }) => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    router.push(`/?gid=${activeGid}&q=${encodeURIComponent(query)}`);
+    router.push(`/?q=${encodeURIComponent(query)}`);
   };
 
   return (
