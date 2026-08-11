@@ -340,3 +340,64 @@ footer {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 }
+
+/* Search Input Windows 11 Style */
+.search-form {
+  display: flex;
+  align-items: center;
+  margin: 0 20px;
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  color: #5f6368;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 16px 10px 36px;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  background-color: #f5f6f7;
+  transition: all 0.2s ease-in-out;
+  outline: none;
+  font-family: inherit;
+}
+
+.search-input:focus, .search-input:hover {
+  background-color: #ffffff;
+  border-color: #f36f21;
+  box-shadow: 0 0 0 2px rgba(243, 111, 33, 0.2);
+}
+
+.search-input::placeholder {
+  color: #8c8c8c;
+}
+
+/* Adjust header container to fit search */
+.header-container {
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+@media (max-width: 768px) {
+  .search-form {
+    order: 3;
+    max-width: 100%;
+    margin: 10px 0 0 0;
+  }
+}

@@ -4,18 +4,18 @@ import React, { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
 import { fetchProductsAction } from '../app/actions';
 
-export default function ProductList({ initialProducts, initialHasMore, gid }) {
+export default function ProductList({ initialProducts, initialHasMore, gid, query = '' }) {
   const [products, setProducts] = useState(initialProducts);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialHasMore);
 
-  // Reset state when gid changes (when user clicks a different category link)
+  // Reset state when gid or query changes (when user clicks a different category link or searches)
   useEffect(() => {
     setProducts(initialProducts);
     setPage(1);
     setHasMore(initialHasMore);
-  }, [gid, initialProducts, initialHasMore]);
+  }, [gid, query, initialProducts, initialHasMore]);
 
   const loadMore = async () => {
     if (loading || !hasMore) return;
@@ -23,7 +23,7 @@ export default function ProductList({ initialProducts, initialHasMore, gid }) {
     setLoading(true);
     try {
       const nextPage = page + 1;
-      const result = await fetchProductsAction(gid, nextPage, 50);
+      const result = await fetchProductsAction(gid, nextPage, 50, query);
       
       setProducts(prev => [...prev, ...result.products]);
       setHasMore(result.hasMore);

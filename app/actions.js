@@ -4,7 +4,7 @@ import Papa from 'papaparse';
 
 const BASE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1p8RBj2R1_5YoQuuxM8uUJT079VYwnrWjacgritMSu9Y/export?format=csv';
 
-export async function fetchProductsAction(gid, page = 1, limit = 50) {
+export async function fetchProductsAction(gid, page = 1, limit = 50, query = '') {
   try {
     const fetchUrl = gid ? `${BASE_SHEET_URL}&gid=${gid}` : BASE_SHEET_URL;
     const response = await axios.get(fetchUrl);
@@ -12,6 +12,11 @@ export async function fetchProductsAction(gid, page = 1, limit = 50) {
     
     let products = parsedData.data;
     products = products.filter(p => p.picture_url && p.product_name && p.picture_url.startsWith('http'));
+    
+    if (query) {
+      const q = query.toLowerCase();
+      products = products.filter(p => p.product_name.toLowerCase().includes(q));
+    }
     
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
